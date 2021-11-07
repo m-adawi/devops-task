@@ -15,14 +15,14 @@ mongo_collection = mongo_db["ipVisits"]
 
 @app.route("/")
 def hello():
-    user_id = redis_connection.incr("count")
+    total_visits = redis_connection.incr("count")
     agent = request.headers.get("User-Agent")
     ip = request.remote_addr
     if mongo_collection.count_documents({'address':ip}):
         mongo_collection.update({'address':ip}, {'$inc':{'visits':1}})
     else:
         mongo_collection.insert_one({'address':ip, 'visits':1})
-    return render_template("index.html", user_id=user_id, agent=agent, ip=ip)
+    return render_template("index.html", total_visits=total_visits, agent=agent, ip=ip)
 
 @app.route("/health")
 def health():
